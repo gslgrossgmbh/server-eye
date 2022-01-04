@@ -1,1 +1,16 @@
-TestKey = TestValue
+# --- SE-AUTOINSTALLER configuration file ---
+# Keys with * are required
+# All other key lines can be deleted if not needed
+
+*AgentDownloadUrl = 
+*ApiKey = 
+*ConnectorId = 
+*CustomerId = 
+Port = 
+Silent = 
+ProxyUrl = 
+ProxyPort = 
+ProxyDomain = 
+ProxyUser = 
+ProxyPassword = 
+CleanUp = 
