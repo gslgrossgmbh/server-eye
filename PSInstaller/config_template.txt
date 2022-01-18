@@ -1,16 +1,7 @@
-# --- SE-AUTOINSTALLER configuration file ---
 # Keys with * are required
-# All other key lines can be deleted if not needed
+# Without parentGuid a occ connector will be installed
 
-*AgentDownloadUrl = 
-*ApiKey = 
-*ConnectorId = 
-*CustomerId = 
-Port = 
-Silent = 
-ProxyUrl = 
-ProxyPort = 
-ProxyDomain = 
-ProxyUser = 
-ProxyPassword = 
-CleanUp = 
+*ScriptUrl = https://occ.server-eye.de/download/se/Deploy-ServerEye.ps1
+*CustomerNumber = 
+*SecretKey = 
+parentGuid = 

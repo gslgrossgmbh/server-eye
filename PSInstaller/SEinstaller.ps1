@@ -13,6 +13,9 @@ $config=@{}
 $configContent = Get-Content "config.txt"
 
 foreach ($key in $configContent) {
+    if ($key -eq "") { # Skip line if empty
+        continue
+    }
     $key = [regex]::split($key,' = ')
     if ($key[0].StartsWith("*")) { # Check if line is a required key
         if ($key[1] -eq "") { # Check if required key is empty
@@ -21,16 +24,17 @@ foreach ($key in $configContent) {
         } else {
             $config.Add($key[0].Substring(1), $key[1])
         }
+    } elseif ($key[1] -eq "") { # Skip line if empty value
+        continue
     } elseif (-Not $key[0].StartsWith("#")) { # Check if line is not a comment
         $config.Add($key[0], $key[1])
     }
 }
 
 $required_config_keys = @(
-    'AgentDownloadUrl',
-    'ApiKey',
-    'ConnectorId',
-    'CustomerId'
+    'CustomerNumber',
+    'SecretKey',
+    'ScriptUrl'
 )
 
 foreach ($required_config_key in $required_config_keys) {
@@ -42,6 +46,22 @@ foreach ($required_config_key in $required_config_keys) {
 
 Write-Host "[INFO] Config loaded successfully" -ForegroundColor Green
 
-# TODO Installing, Fix variable with * not getting found
+# Check for existing deployment script or download from ScriptUrl
+if (Test-Path "Deploy-ServerEye.ps1") {
+    Write-Host "[INFO] File Deploy-ServerEye.ps1 exists" -ForegroundColor Green
+} else {
+    Write-Host "[INFO] File Deploy-ServerEye.ps1 does not exist and will be downloaded" -ForegroundColor Green
+    Invoke-WebRequest $config.Get_Item($ScriptUrl) -OutFile "Deploy-ServerEye.ps1"
+    Write-Host "[INFO] File Deploy-ServerEye.ps1 has been downloaded successfully" -ForegroundColor Green
+}
 
-# https://servereye.freshdesk.com/support/solutions/articles/14000113669-wie-installiere-ich-se-via-kommandozeile
+# Check installation type
+if ($config.Get_Item("ParentGuid").length -ne 0) {
+    # Install SensorhubOnly
+    Write-Host "[INFO] Installing Sensorhub"
+    Deploy-ServerEye.ps1 -Download -Install -Deploy SensorhubOnly -Customer $config.Get_Item("CustomerNumber") -Secret $config.Get_Item("SecretKey") -ParentGuid $config.Get_Item("ParentGuid")
+} else {
+    # Install Sensorhub and OCC Connector
+    Write-Host "[INFO] Installing OCC Connector and Sensorhub"
+    Deploy-ServerEye.ps1 -Download -Install -Deploy all -Customer $config.Get_Item("CustomerNumber") -Secret $config.Get_Item("SecretKey")
+}
