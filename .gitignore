@@ -1,5 +1,6 @@
 # /SEInstaller
 PSInstaller/config.txt
 PSInstaller/Deploy-ServerEye.ps1
+PSInstaller/Uninstall-ServerEye.ps1
 PSInstaller/*.msi
 PSInstaller/*.exe

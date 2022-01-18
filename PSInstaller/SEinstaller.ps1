@@ -33,8 +33,7 @@ foreach ($key in $configContent) {
 
 $required_config_keys = @(
     'CustomerNumber',
-    'SecretKey',
-    'ScriptUrl'
+    'SecretKey'
 )
 
 foreach ($required_config_key in $required_config_keys) {
@@ -46,25 +45,33 @@ foreach ($required_config_key in $required_config_keys) {
 
 Write-Host "[INFO] Config loaded successfully" -ForegroundColor Green
 
-# Check for existing deployment script or download from ScriptUrl
+# Check for existing deployment script or download
 if (Test-Path "Deploy-ServerEye.ps1") {
     Write-Host "[INFO] File Deploy-ServerEye.ps1 exists" -ForegroundColor Green
 } else {
     Write-Host "[INFO] File Deploy-ServerEye.ps1 does not exist and will be downloaded" -ForegroundColor Green
-    Invoke-WebRequest $config.Get_Item($ScriptUrl) -OutFile "Deploy-ServerEye.ps1"
+    Invoke-WebRequest "https://occ.server-eye.de/download/se/Deploy-ServerEye.ps1" -OutFile "Deploy-ServerEye.ps1"
     Write-Host "[INFO] File Deploy-ServerEye.ps1 has been downloaded successfully" -ForegroundColor Green
 }
 
-# DELETE C:\ProgramData\ServerEye3
+# Uninstall and cleanup if uninstall is true
+if ($config.Get_Item("uninstall") -eq "true") {
+    Write-Host "[WARN] Server Eye will be uninstalled" -ForegroundColor Yellow
+    Write-Host "[WARN] Press any key to continue ..." -ForegroundColor Yellow
+    $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+    Invoke-WebRequest "https://raw.githubusercontent.com/Server-Eye/se-installer-cli/master/de/Uninstall-ServerEye.ps1" -OutFile "Uninstall-ServerEye.ps1"
+    .\Uninstall-ServerEye.ps1
+    Write-Host "[INFO] Server Eye uninstalled" -ForegroundColor Green
+}
 
 # Check installation type
 if ($config.Get_Item("ParentGuid").length -ne 0) {
     # Install SensorhubOnly
-    Write-Host "[INFO] Installing Sensorhub" -Color Green
+    Write-Host "[INFO] Installing Sensorhub" -ForegroundColor Green
     .\Deploy-ServerEye.ps1 -Download -Install -Deploy SensorhubOnly -Customer $config.Get_Item("CustomerNumber") -Secret $config.Get_Item("SecretKey") -ParentGuid $config.Get_Item("ParentGuid")
-    Write-Host "[INFO] Sensorhub installed!" -Color Green
+    Write-Host "[INFO] Sensorhub installed!" -ForegroundColor Green
 } else {
     # Install Sensorhub and OCC Connector
-    Write-Host "[INFO] OCC Connector and Sensorhub installed!" -Color Green
+    Write-Host "[INFO] OCC Connector and Sensorhub installed!" -ForegroundColor Green
     .\Deploy-ServerEye.ps1 -Download -Install -Deploy all -Customer $config.Get_Item("CustomerNumber") -Secret $config.Get_Item("SecretKey")
 }

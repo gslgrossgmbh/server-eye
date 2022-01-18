@@ -1,7 +1,7 @@
 # Keys with * are required
 # Without parentGuid a occ connector will be installed
 
-*ScriptUrl = https://occ.server-eye.de/download/se/Deploy-ServerEye.ps1
 *CustomerNumber = 
 *SecretKey = 
 parentGuid = 
+uninstall = true
