@@ -55,13 +55,16 @@ if (Test-Path "Deploy-ServerEye.ps1") {
     Write-Host "[INFO] File Deploy-ServerEye.ps1 has been downloaded successfully" -ForegroundColor Green
 }
 
+# DELETE C:\ProgramData\ServerEye3
+
 # Check installation type
 if ($config.Get_Item("ParentGuid").length -ne 0) {
     # Install SensorhubOnly
-    Write-Host "[INFO] Installing Sensorhub"
-    Deploy-ServerEye.ps1 -Download -Install -Deploy SensorhubOnly -Customer $config.Get_Item("CustomerNumber") -Secret $config.Get_Item("SecretKey") -ParentGuid $config.Get_Item("ParentGuid")
+    Write-Host "[INFO] Installing Sensorhub" -Color Green
+    .\Deploy-ServerEye.ps1 -Download -Install -Deploy SensorhubOnly -Customer $config.Get_Item("CustomerNumber") -Secret $config.Get_Item("SecretKey") -ParentGuid $config.Get_Item("ParentGuid")
+    Write-Host "[INFO] Sensorhub installed!" -Color Green
 } else {
     # Install Sensorhub and OCC Connector
-    Write-Host "[INFO] Installing OCC Connector and Sensorhub"
-    Deploy-ServerEye.ps1 -Download -Install -Deploy all -Customer $config.Get_Item("CustomerNumber") -Secret $config.Get_Item("SecretKey")
+    Write-Host "[INFO] OCC Connector and Sensorhub installed!" -Color Green
+    .\Deploy-ServerEye.ps1 -Download -Install -Deploy all -Customer $config.Get_Item("CustomerNumber") -Secret $config.Get_Item("SecretKey")
 }
